@@ -20,7 +20,7 @@ After that, registers may be set:
 
 Fetch the next output sample with GetSample:
 
-    sample := float32(tia.GetSample())/128 - 0.5
+    sample := tia.GetSample()
 
 ... or you can fill a buffer with samples:
 
