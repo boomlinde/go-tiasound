@@ -1,22 +1,7 @@
 package tiasound
 
 const SET_TO_1 = 0x00
-const POLY4 = 0x01
-const DIV31_POLY4 = 0x02
-const POLY5_POLY4 = 0x03
-const PURE = 0x04
-const PURE2 = 0x05
-const DIV31_PURE = 0x06
-const POLY5_2 = 0x07
 const POLY9 = 0x08
-const POLY5 = 0x09
-const DIV31_POLY5 = 0x0a
-const POLY5_POLY5 = 0x0b
-const DIV3_PURE = 0x0c
-const DIV3_PURE2 = 0x0d
-const DIV93_PURE = 0x0e
-const DIV3_POLY5 = 0x0f
-
 const DIV3_MASK = 0x0c
 
 const AUDC0 = 0x15
@@ -29,9 +14,6 @@ const AUDV1 = 0x1a
 const POLY4_SIZE = 0x000f
 const POLY5_SIZE = 0x001f
 const POLY9_SIZE = 0x01ff
-
-const CHAN1 = 0
-const CHAN2 = 1
 
 var bit4 = [POLY4_SIZE]uint8{1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0}
 var bit5 = [POLY5_SIZE]uint8{
@@ -82,7 +64,7 @@ func NewTiaSound(sample_freq, playback_freq int) *TiaSound {
 	t.samp_n_max = uint16((sample_freq << 8) / playback_freq)
 	t.samp_n_cnt = 0
 
-	for ch := CHAN1; ch <= CHAN2; ch++ {
+	for ch := 0; ch < 2; ch++ {
 		t.outvol[ch] = 0
 		t.div_n_cnt[ch] = 0
 		t.div_n_max[ch] = 0
@@ -148,7 +130,7 @@ func (t *TiaSound) Update(addr uint16, val uint8) {
 // GetSample advances the TIA emulation and returns the next sample.
 func (t *TiaSound) GetSample() uint8 {
 	for {
-		for ch := CHAN1; ch <= CHAN2; ch++ {
+		for ch := 0; ch < 2; ch++ {
 			if t.div_n_cnt[ch] > 1 {
 				t.div_n_cnt[ch]--
 			} else if t.div_n_cnt[ch] == 1 {
