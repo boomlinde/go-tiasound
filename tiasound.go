@@ -15,59 +15,31 @@ const POLY4_SIZE = 0x000f
 const POLY5_SIZE = 0x001f
 const POLY9_SIZE = 0x01ff
 
-var bit4 = [POLY4_SIZE]uint8{1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0}
-var bit5 = [POLY5_SIZE]uint8{
-	0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0,
-	1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1,
-}
-var bit9 = [POLY9_SIZE]uint8{
-	0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0,
-	0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1,
-	0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1,
-	0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0,
-	0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0,
-	1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0,
-	0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1,
-	0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0,
-	0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0,
-	1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0,
-	0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0,
-	0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-	0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0,
-	1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0,
-	1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0,
-	0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0,
-}
-var div31 = [POLY5_SIZE]uint8{
-	0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-}
-
 type TiaSound struct {
-	audc       [2]uint8
-	audf       [2]uint8
-	audv       [2]uint8
-	outvol     [2]uint8
-	p4         [2]uint8
-	p5         [2]uint8
-	p9         [2]uint16
-	div_n_cnt  [2]uint8
-	div_n_max  [2]uint8
-	samp_n_max uint16
-	samp_n_cnt uint16
+	audc    [2]uint8
+	audf    [2]uint8
+	audv    [2]uint8
+	outvol  [2]uint8
+	p4      [2]uint8
+	p5      [2]uint8
+	p9      [2]uint16
+	divCnt  [2]uint8
+	divMax  [2]uint8
+	sampMax uint16
+	sampCnt uint16
 }
 
 // NewTiaSound initializes a TiaSound structure and returns its pointer.
 func NewTiaSound(sample_freq, playback_freq int) *TiaSound {
 	t := &TiaSound{}
 
-	t.samp_n_max = uint16((sample_freq << 8) / playback_freq)
-	t.samp_n_cnt = 0
+	t.sampMax = uint16((sample_freq << 8) / playback_freq)
+	t.sampCnt = 0
 
 	for ch := 0; ch < 2; ch++ {
 		t.outvol[ch] = 0
-		t.div_n_cnt[ch] = 0
-		t.div_n_max[ch] = 0
+		t.divCnt[ch] = 0
+		t.divMax[ch] = 0
 		t.audc[ch] = 0
 		t.audf[ch] = 0
 		t.audv[ch] = 0
@@ -118,10 +90,10 @@ func (t *TiaSound) Update(addr uint16, val uint8) {
 			}
 		}
 
-		if new_val != uint16(t.div_n_max[ch]) {
-			t.div_n_max[ch] = uint8(new_val)
-			if (t.div_n_cnt[ch] == 0) || (new_val == 0) {
-				t.div_n_cnt[ch] = uint8(new_val)
+		if new_val != uint16(t.divMax[ch]) {
+			t.divMax[ch] = uint8(new_val)
+			if (t.divCnt[ch] == 0) || (new_val == 0) {
+				t.divCnt[ch] = uint8(new_val)
 			}
 		}
 	}
@@ -131,10 +103,10 @@ func (t *TiaSound) Update(addr uint16, val uint8) {
 func (t *TiaSound) GetSample() uint8 {
 	for {
 		for ch := 0; ch < 2; ch++ {
-			if t.div_n_cnt[ch] > 1 {
-				t.div_n_cnt[ch]--
-			} else if t.div_n_cnt[ch] == 1 {
-				t.div_n_cnt[ch] = t.div_n_max[ch]
+			if t.divCnt[ch] > 1 {
+				t.divCnt[ch]--
+			} else if t.divCnt[ch] == 1 {
+				t.divCnt[ch] = t.divMax[ch]
 
 				t.p5[ch]++
 				if t.p5[ch] == POLY5_SIZE {
@@ -185,9 +157,9 @@ func (t *TiaSound) GetSample() uint8 {
 			}
 		}
 
-		t.samp_n_cnt -= 256
-		if t.samp_n_cnt < 256 {
-			t.samp_n_cnt += t.samp_n_max
+		t.sampCnt -= 256
+		if t.sampCnt < 256 {
+			t.sampCnt += t.sampMax
 			return t.outvol[0] + t.outvol[1]
 		}
 	}
