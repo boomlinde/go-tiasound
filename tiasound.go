@@ -31,24 +31,7 @@ type TiaSound struct {
 
 // NewTiaSound initializes a TiaSound structure and returns its pointer.
 func NewTiaSound(sample_freq, playback_freq int) *TiaSound {
-	t := &TiaSound{}
-
-	t.sampMax = uint16((sample_freq << 8) / playback_freq)
-	t.sampCnt = 0
-
-	for ch := 0; ch < 2; ch++ {
-		t.outvol[ch] = 0
-		t.divCnt[ch] = 0
-		t.divMax[ch] = 0
-		t.audc[ch] = 0
-		t.audf[ch] = 0
-		t.audv[ch] = 0
-		t.p4[ch] = 0
-		t.p5[ch] = 0
-		t.p9[ch] = 0
-	}
-
-	return t
+	return &TiaSound{sampMax: uint16((sample_freq << 8) / playback_freq)}
 }
 
 // Update updates a TIA register with a new value and adjusts the emulation accordingly
