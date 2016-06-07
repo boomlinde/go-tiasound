@@ -62,9 +62,9 @@ var div31 = [POLY5_SIZE]uint8{
 }
 
 type TiaSound struct {
-	AUDC       [2]uint8
-	AUDF       [2]uint8
-	AUDV       [2]uint8
+	audc       [2]uint8
+	audf       [2]uint8
+	audv       [2]uint8
 	outvol     [2]uint8
 	p4         [2]uint8
 	p5         [2]uint8
@@ -86,9 +86,9 @@ func NewTiaSound(sample_freq, playback_freq int) *TiaSound {
 		t.outvol[ch] = 0
 		t.div_n_cnt[ch] = 0
 		t.div_n_max[ch] = 0
-		t.AUDC[ch] = 0
-		t.AUDF[ch] = 0
-		t.AUDV[ch] = 0
+		t.audc[ch] = 0
+		t.audf[ch] = 0
+		t.audv[ch] = 0
 		t.p4[ch] = 0
 		t.p5[ch] = 0
 		t.p9[ch] = 0
@@ -104,34 +104,34 @@ func (t *TiaSound) Update(addr uint16, val uint8) {
 
 	switch addr {
 	case AUDC0:
-		t.AUDC[0] = val & 0x0f
+		t.audc[0] = val & 0x0f
 		ch = 0
 	case AUDC1:
-		t.AUDC[1] = val & 0x0f
+		t.audc[1] = val & 0x0f
 		ch = 1
 	case AUDF0:
-		t.AUDF[0] = val & 0x1f
+		t.audf[0] = val & 0x1f
 		ch = 0
 	case AUDF1:
-		t.AUDF[1] = val & 0x1f
+		t.audf[1] = val & 0x1f
 		ch = 1
 	case AUDV0:
-		t.AUDV[0] = (val & 0x0f) << 3
+		t.audv[0] = (val & 0x0f) << 3
 		ch = 0
 	case AUDV1:
-		t.AUDV[1] = (val & 0x0f) << 3
+		t.audv[1] = (val & 0x0f) << 3
 		ch = 1
 	default:
 		ch = 255
 	}
 
 	if ch != 255 {
-		if t.AUDC[ch] == SET_TO_1 {
+		if t.audc[ch] == SET_TO_1 {
 			new_val = 0
-			t.outvol[ch] = t.AUDV[ch]
+			t.outvol[ch] = t.audv[ch]
 		} else {
-			new_val = uint16(t.AUDF[ch] + 1)
-			if (t.AUDC[ch] & DIV3_MASK) == DIV3_MASK {
+			new_val = uint16(t.audf[ch] + 1)
+			if (t.audc[ch] & DIV3_MASK) == DIV3_MASK {
 				new_val *= 3
 			}
 		}
@@ -159,30 +159,30 @@ func (t *TiaSound) GetSample() uint8 {
 					t.p5[ch] = 0
 				}
 
-				if ((t.AUDC[ch] & 0x02) == 0) ||
-					(((t.AUDC[ch] & 0x01) == 0) && (div31[t.p5[ch]] != 0)) ||
-					(((t.AUDC[ch] & 0x01) == 1) && (bit5[t.p5[ch]] != 0)) {
-					if t.AUDC[ch]&0x04 != 0 {
+				if ((t.audc[ch] & 0x02) == 0) ||
+					(((t.audc[ch] & 0x01) == 0) && (div31[t.p5[ch]] != 0)) ||
+					(((t.audc[ch] & 0x01) == 1) && (bit5[t.p5[ch]] != 0)) {
+					if t.audc[ch]&0x04 != 0 {
 						if t.outvol[ch] != 0 {
 							t.outvol[ch] = 0
 						} else {
-							t.outvol[ch] = t.AUDV[ch]
+							t.outvol[ch] = t.audv[ch]
 						}
-					} else if t.AUDC[ch]&0x08 != 0 {
-						if t.AUDC[ch] == POLY9 {
+					} else if t.audc[ch]&0x08 != 0 {
+						if t.audc[ch] == POLY9 {
 							t.p9[ch]++
 							if t.p9[ch] == POLY9_SIZE {
 								t.p9[ch] = 0
 							}
 
 							if bit9[t.p9[ch]] != 0 {
-								t.outvol[ch] = t.AUDV[ch]
+								t.outvol[ch] = t.audv[ch]
 							} else {
 								t.outvol[ch] = 0
 							}
 						} else {
 							if bit5[t.p5[ch]] != 0 {
-								t.outvol[ch] = t.AUDV[ch]
+								t.outvol[ch] = t.audv[ch]
 							} else {
 								t.outvol[ch] = 0
 							}
@@ -194,7 +194,7 @@ func (t *TiaSound) GetSample() uint8 {
 						}
 
 						if bit4[t.p4[ch]] != 0 {
-							t.outvol[ch] = t.AUDV[ch]
+							t.outvol[ch] = t.audv[ch]
 						} else {
 							t.outvol[ch] = 0
 						}
